@@ -23,6 +23,40 @@ import { Component, ViewChild, ElementRef, OnInit, HostListener, Inject, Injecta
     this.ctx = this.canvas.getContext('2d')! as CanvasRenderingContext2D;
   }
 
+  drawPoint:Function = this.drawPointPen;  // This is the function that is called when the user clicks on the canvas.
+  nStartX = 0;
+  nStartY = 0;
+  bIsDrawing = false;
+  nDeltaX = 0;
+  nDeltaY = 0;
+  radius = 10;
+
+  putPoint(e: MouseEvent){    // e is event: e.clientX and e.clientY are the coordinates of the mouse.
+    this.nStartX = e.clientX;
+    this.nStartY = e.clientY;
+    this.bIsDrawing = true;
+  }
+  stopPoint(){
+    this.bIsDrawing = false; 
+    // Record history
+  }
+
+  drawPointPen(e: MouseEvent){        // This draws on mouse
+    if(!this.bIsDrawing)
+        return;
+    this.ctx!.beginPath();
+    this.ctx!.moveTo(this.nStartX, this.nStartY);
+    this.ctx!.lineTo(e.clientX, e.clientY);
+    this.ctx!.stroke();
+
+    this.nStartX = e.clientX;
+    this.nStartY = e.clientY;
+  }
+
+  @HostListener('mousedown', ['$event']) onclick(e: MouseEvent)  {this.putPoint(e);}
+  @HostListener('mousemove', ['$event']) onmove(e: MouseEvent)   {this.drawPoint(e);}
+  @HostListener('mouseup',   ['$event']) onup()                  {this.stopPoint();}
+
   DrawImage(){
     this.ctx!.drawImage(this.ourImage, 0, 0);
   }
@@ -32,7 +66,5 @@ import { Component, ViewChild, ElementRef, OnInit, HostListener, Inject, Injecta
   }
 
   Download(){}
-
-  
 
 }
